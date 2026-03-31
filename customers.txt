@@ -1,0 +1,5 @@
+Customer name : riya total pizza bought : 2 total price of that pizza 400
+Customer name : R total pizza bought : 3 total price of that pizza 620
+Customer name : tanvi total pizza bought : 3 total price of that pizza 490
+Customer name : Ria total pizza bought : 1 total price of that pizza 200
+Customer name : xyz total pizza bought : 1 total price of that pizza 200
