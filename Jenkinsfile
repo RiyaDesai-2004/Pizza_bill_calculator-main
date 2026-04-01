@@ -31,16 +31,18 @@ pipeline {
             }
         }
 
-           stage('Run & Output') {
-        steps {
-            echo '🚀 Container run ho raha hai...'
-            sh 'docker run --name ${CONTAINER_NAME} ${IMAGE_NAME} || true'
-        }
-        post {
-            always {
-                sh 'docker rm -f ${CONTAINER_NAME} || true'
+        stage('Run & Output') {
+            steps {
+                echo '🚀 Container run ho raha hai...'
+                sh 'docker run --name ${CONTAINER_NAME} ${IMAGE_NAME} || true'
+            }
+            post {
+                always {
+                    sh 'docker rm -f ${CONTAINER_NAME} || true'
+                }
             }
         }
+
     }
 
     post {
