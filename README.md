@@ -3,7 +3,7 @@
 
 ## 📌 Project Overview
 
-The Pizza Bill Calculator is a simple Java-based command-line application designed to manage pizza orders and generate customer bills efficiently. It allows users to add orders, calculate total costs, and store customer details using file handling. The project also demonstrates basic object-oriented programming concepts, along with Docker containerization and Jenkins-based CI/CD automation for build and deployment.
+# The Pizza Bill Calculator is a simple Java-based command-line application designed to manage pizza orders and generate customer bills efficiently. It allows users to add orders, calculate total costs, and store customer details using file handling. The project also demonstrates basic object-oriented programming concepts, along with Docker containerization and Jenkins-based CI/CD automation for build and deployment.
 ---
 
 ## 🚀 Features
