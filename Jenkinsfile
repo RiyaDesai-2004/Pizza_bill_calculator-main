@@ -26,7 +26,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo '🐳 Docker image build ho rahi hai...'
-                sh 'docker build -t ${IMAGE_NAME} .'
+                sh 'docker build --no-cache -t ${IMAGE_NAME} .'
                 echo '✅ Docker image ready: ${IMAGE_NAME}'
             }
         }
@@ -42,7 +42,6 @@ pipeline {
                 }
             }
         }
-
     }
 
     post {
