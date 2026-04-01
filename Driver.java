@@ -57,6 +57,8 @@ class Customer extends Pizza{
     public void SelectPizza(){
         // counter flag for deciding the visit is first or not
         int counter = 0 ;
+         String moreDecider = null;
+        String flg = null;
         Scanner sc = new Scanner(System.in);
         // decider that decides whether user wants another pizza or not
         String moreDecider = null;
@@ -190,6 +192,6 @@ class Driver{
         // passing the entered name to constructor of Customer class
         Customer c1 = new Customer(st1);
         // calling method to select and order pizza
-        c1.SelectPizza();
+        c1.SelectPizza(sc1);
     }
 }
