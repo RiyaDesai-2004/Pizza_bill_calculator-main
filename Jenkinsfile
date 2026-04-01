@@ -34,7 +34,15 @@ pipeline {
         stage('Run & Output') {
             steps {
                 echo '🚀 Container run ho raha hai...'
-                sh 'printf "TestUser\nveg\n1\n2\nno\n" | docker run -i --name ${CONTAINER_NAME} ${IMAGE_NAME} || true'
+                sh '''
+docker run -i --name ${CONTAINER_NAME} ${IMAGE_NAME} <<EOF || true
+TestUser
+veg
+1
+2
+no
+EOF
+                '''
             }
             post {
                 always {
