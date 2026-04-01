@@ -1,30 +1,55 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_NAME = "pizza-app"
+        CONTAINER_NAME = "pizza-container"
+    }
+
     stages {
 
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                echo 'Building the project...'
+                echo '📥 Code checkout ho raha hai...'
+                checkout scm
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                echo '⚙️ Java code compile ho raha hai...'
                 sh 'javac Driver.java'
+                echo '✅ Compile successful!'
             }
         }
 
-        stage('Check Class File') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Checking compiled output...'
-                sh 'ls -la *.class'
+                echo '🐳 Docker image build ho rahi hai...'
+                sh 'docker build -t ${IMAGE_NAME} .'
+                echo '✅ Docker image ready: ${IMAGE_NAME}'
             }
         }
 
+        stage('Run & Output') {
+            steps {
+                echo '🚀 Container run ho raha hai...'
+                sh 'printf "TestUser\nveg\n1\n2\nno\n" | docker run -i --name ${CONTAINER_NAME} ${IMAGE_NAME} || true'
+            }
+            post {
+                always {
+                    sh 'docker rm -f ${CONTAINER_NAME} || true'
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo 'Pipeline SUCCESS! ✅'
+            echo '🎉 Pipeline successfully complete hua!'
         }
         failure {
-            echo 'Pipeline FAILED! ❌'
+            echo '❌ Pipeline fail hua — logs check karo!'
         }
     }
 }
