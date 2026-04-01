@@ -31,18 +31,14 @@ pipeline {
             }
         }
 
-        stage('Run & Output') {
-            steps {
-                echo '🚀 Container run ho raha hai...'
-                sh '''
-                    echo -e "TestUser\nveg\n1\n2\nno" > /tmp/pizza_input.txt
-                    cat /tmp/pizza_input.txt | docker run -i --name ${CONTAINER_NAME} ${IMAGE_NAME} || true
-                '''
-            }
-            post {
-                always {
-                    sh 'docker rm -f ${CONTAINER_NAME} || true'
-                }
+           stage('Run & Output') {
+        steps {
+            echo '🚀 Container run ho raha hai...'
+            sh 'docker run --name ${CONTAINER_NAME} ${IMAGE_NAME} || true'
+        }
+        post {
+            always {
+                sh 'docker rm -f ${CONTAINER_NAME} || true'
             }
         }
     }
