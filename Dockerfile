@@ -11,4 +11,5 @@ COPY . /app
 RUN javac Driver.java
 
 # Run the program
-CMD ["java", "Driver"]
+CMD ["sh", "-c", "java Driver < input.txt"]
+
