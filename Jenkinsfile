@@ -30,33 +30,17 @@ pipeline {
                 echo '✅ Docker image ready: ${IMAGE_NAME}'
             }
         }
-        
+
         stage('Run & Output') {
             steps {
                 echo '🚀 Container run ho raha hai...'
-                sh '''
-                    printf "TestUser\nveg\n1\n2\nno\n" | docker run -i --name ${CONTAINER_NAME} ${IMAGE_NAME} || true
-                '''
+                sh 'printf "TestUser\nveg\n1\n2\nno\n" | docker run -i --name ${CONTAINER_NAME} ${IMAGE_NAME} || true'
             }
             post {
                 always {
                     sh 'docker rm -f ${CONTAINER_NAME} || true'
                 }
             }
-        
-        /*stage('Run & Output') {
-            steps {
-                echo '🚀 Container run ho raha hai...'
-                // Non-interactive test run (predefined input ke saath)
-                sh '''
-                    echo "TestUser\nveg\n1\n2\nno" | docker run -i --name ${CONTAINER_NAME} ${IMAGE_NAME} || true
-                '''
-            }
-            post {
-                always {
-                    sh 'docker rm -f ${CONTAINER_NAME} || true'
-                }
-            }*/
         }
     }
 
