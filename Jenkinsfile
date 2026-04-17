@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-    // Yeh automation trigger hai jo webhook ke signals ko catch karta hai
+    // GitHub webhook triggers ko enable karta hai
     triggers {
         githubPush()
     }
@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Workspace clean karke fresh code checkout karta hai
+                // Workspace ko clean karke fresh code leta hai
                 cleanWs() 
                 checkout scm
                 echo "🚀 Building Branch: ${env.BRANCH_NAME}"
@@ -31,8 +31,8 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // 'sonar-scanner' wahi naam rakhein jo Jenkins Global Tool Configuration mein hai
-                    def scannerHome = tool 'sonar-scanner' 
+                    // Tool name wahi rakhein jo Global Tool Config mein hai
+                    def scannerHome = tool 'sonar-scanner'
                     
                     withSonarQubeEnv('sonarqube') {
                         sh "${scannerHome}/bin/sonar-scanner \
@@ -41,26 +41,26 @@ pipeline {
                         -Dsonar.java.binaries=."
                     }
                     
-                    // Quality Gate Automation: Build fail ho jayegi agar code standards meet nahi hue
+                    // Quality Gate Automation
                     timeout(time: 5, unit: 'MINUTES') {
                         def qg = waitForQualityGate()
                         if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            error "Pipeline aborted: Quality Gate status is ${qg.status}"
                         }
                     }
                 }
             }
         }
 
-        stage('Build & Test Docker') {
+        stage('Docker Build & Run') {
             steps {
-                echo '🐳 Docker image build aur test run ho raha hai...'
+                echo '🐳 Docker operations start...'
                 sh 'docker build --no-cache -t ${IMAGE_NAME} .'
                 sh 'docker run --name ${CONTAINER_NAME} ${IMAGE_NAME} || true'
             }
             post {
                 always {
-                    echo '🧹 Cleanup: Container remove ho raha hai...'
+                    echo '🧹 Cleaning up container...'
                     sh 'docker rm -f ${CONTAINER_NAME} || true'
                 }
             }
@@ -69,10 +69,10 @@ pipeline {
 
     post {
         success {
-            echo '✅ Automation Complete: Branch verified successfully!'
+            echo '🎉 Automation Success: Sab kuch sahi se chal gaya!'
         }
         failure {
-            echo '❌ Automation Failed: Please check SonarQube or build logs.'
+            echo '❌ Automation Failed: Logs check karein.'
         }
     }
 }
