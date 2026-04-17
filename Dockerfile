@@ -1,3 +1,5 @@
+
+
 # Use a valid OpenJDK image (Java 18 compatible)
 FROM eclipse-temurin:18-jdk 
 
