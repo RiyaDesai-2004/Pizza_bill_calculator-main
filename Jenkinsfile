@@ -7,7 +7,6 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout') {
             steps {
                 echo '📥 Code checkout ho raha hai...'
@@ -19,44 +18,46 @@ pipeline {
             steps {
                 echo '⚙️ Java code compile ho raha hai...'
                 sh 'javac Driver.java'
-                echo '✅ Compile successful!'
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // Tool name jo aapne Jenkins 'Tools' mein rakha hai
                     def scannerHome = tool 'sonar-scanner'
-                    
-                    // Server name jo aapne 'System' configurations mein rakha hai
                     withSonarQubeEnv('sonarqube') {
                         sh "${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=pizza-bill-calculator \
-                        -Dsonar.projectName='Pizza Bill Calculator' \
                         -Dsonar.sources=. \
                         -Dsonar.java.binaries=."
+                    }
+                    
+                    // Automation: PR trigger hone par Quality Gate ka wait karega
+                    // Agar SonarQube fail hua toh pipeline yahi ruk jayegi
+                    timeout(time: 5, unit: 'MINUTES') {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
                     }
                 }
             }
         }
 
         stage('Build Docker Image') {
+            // Automation: Yeh stage tabhi chalega jab Quality Gate 'OK' ho
             steps {
                 echo '🐳 Docker image build ho rahi hai...'
                 sh 'docker build --no-cache -t ${IMAGE_NAME} .'
-                echo '✅ Docker image ready: ${IMAGE_NAME}'
             }
         }
 
         stage('Run & Output') {
             steps {
-                echo '🚀 Container run ho raha hai...'
                 sh 'docker run --name ${CONTAINER_NAME} ${IMAGE_NAME} || true'
             }
             post {
                 always {
-                    echo 'Cleaning up container...'
                     sh 'docker rm -f ${CONTAINER_NAME} || true'
                 }
             }
@@ -65,10 +66,10 @@ pipeline {
 
     post {
         success {
-            echo '🎉 Pipeline successfully complete hua!'
+            echo '🎉 Automation Success: PR is verified and ready to merge!'
         }
         failure {
-            echo '❌ Pipeline fail hua — logs check karo!'
+            echo '❌ Automation Failed: Check SonarQube issues or Pipeline logs.'
         }
     }
 }
