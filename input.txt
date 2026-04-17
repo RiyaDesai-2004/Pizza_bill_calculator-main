@@ -1,9 +1,1 @@
-TestUser
-veg
-1
-
-
-2
-
-
-no
+just input file
