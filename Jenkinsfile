@@ -23,6 +23,25 @@ pipeline {
             }
         }
 
+        // --- Naya SonarQube Analysis Stage ---
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Tool name jo aapne 'sonar-scanner' rakha hai
+                    def scannerHome = tool 'sonar-scanner'
+                    
+                    // Server name jo Jenkins System settings mein hai (Example: 'sonarqube-server')
+                    withSonarQubeEnv('sonarqube-server') {
+                        sh "${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=pizza-bill-calculator \
+                        -Dsonar.projectName='Pizza Bill Calculator' \
+                        -Dsonar.sources=. \
+                        -Dsonar.java.binaries=."
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 echo '🐳 Docker image build ho rahi hai...'
