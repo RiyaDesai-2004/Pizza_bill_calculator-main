@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    // Yeh trigger GitHub webhook ke signal ko sunta hai
+    triggers {
+        githubPush() 
+    }
+
     environment {
         IMAGE_NAME = "pizza-app"
         CONTAINER_NAME = "pizza-container"
@@ -9,14 +14,14 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo '📥 Code checkout ho raha hai...'
+                // Yeh automatically woh branch uthayega jisme change hua hai
                 checkout scm
+                echo "🚀 Building Branch: ${env.BRANCH_NAME}"
             }
         }
 
         stage('Compile') {
             steps {
-                echo '⚙️ Java code compile ho raha hai...'
                 sh 'javac Driver.java'
             }
         }
@@ -32,28 +37,20 @@ pipeline {
                         -Dsonar.java.binaries=."
                     }
                     
-                    // Automation: PR trigger hone par Quality Gate ka wait karega
-                    // Agar SonarQube fail hua toh pipeline yahi ruk jayegi
+                    // Quality Gate: Agar SonarQube fail toh build STOP
                     timeout(time: 5, unit: 'MINUTES') {
                         def qg = waitForQualityGate()
                         if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            error "Pipeline aborted: Quality Gate status is ${qg.status}"
                         }
                     }
                 }
             }
         }
 
-        stage('Build Docker Image') {
-            // Automation: Yeh stage tabhi chalega jab Quality Gate 'OK' ho
+        stage('Docker Build & Run') {
             steps {
-                echo '🐳 Docker image build ho rahi hai...'
                 sh 'docker build --no-cache -t ${IMAGE_NAME} .'
-            }
-        }
-
-        stage('Run & Output') {
-            steps {
                 sh 'docker run --name ${CONTAINER_NAME} ${IMAGE_NAME} || true'
             }
             post {
@@ -61,15 +58,6 @@ pipeline {
                     sh 'docker rm -f ${CONTAINER_NAME} || true'
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo '🎉 Automation Success: PR is verified and ready to merge!'
-        }
-        failure {
-            echo '❌ Automation Failed: Check SonarQube issues or Pipeline logs.'
         }
     }
 }
